@@ -1,0 +1,57 @@
+:root {
+  --bg: #f7f8f8;
+  --surface: #ffffff;
+  --fg: #1e1e1e;
+  --muted: #6b7378;
+  --line: #d9dfe1;
+  --accent: #1971c2;
+  --up: #2f9e44;
+  --down: #e8590c;
+  font: 16px/1.5 system-ui, -apple-system, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 16px 64px; }
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 28px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: 28px; }
+h2 { margin: 0 0 10px; font-size: 18px; }
+
+button, select, .file {
+  font: inherit;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+button:hover, .file:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.6; cursor: default; }
+
+.picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.file input { display: none; }
+
+.analysis { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.analysis svg { display: block; width: 100%; height: auto; }
+.count { margin: 0 0 8px; }
+.signal { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+.threshold { stroke-width: 1.2; stroke-dasharray: 6 5; }
+.threshold.up, .label.up { stroke: var(--up); fill: var(--up); }
+.threshold.down, .label.down { stroke: var(--down); fill: var(--down); }
+.label { font-size: 12px; stroke: none !important; }
+.rep { fill: var(--fg); }
+.ok { color: var(--up); }
+.bad { color: var(--down); }
+
+.save { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.muted { color: var(--muted); }
+.error { color: var(--down); }
+
+table { width: 100%; border-collapse: collapse; background: var(--surface); }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: ui-monospace, Menlo, monospace; }

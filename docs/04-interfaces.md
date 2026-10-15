@@ -27,25 +27,25 @@ export type Fixture = { description?: string; expectedReps?: number; sampleRateH
 ## Browser (`apps/web`)
 
 ```ts
-// Result builder
-function buildSession(fixture: Fixture, now: Date, newId: () => string): Session;
+// Result builder — also returns the analysis for the chart
+function buildSession(fixture: Fixture, now: Date, newId: () => string): { session: Session; analysis: RepAnalysis };
 
 // API client — the only code that calls fetch
 interface ApiClient {
   save(session: Session): Promise<{ status: 201 | 200; session: StoredSession }>;
   list(): Promise<StoredSession[]>;
 }
-function createApiClient(token: string, baseUrl?: string): ApiClient;
+function createApiClient(token: string, baseUrl?: string, fetchFn?: typeof fetch): ApiClient;
 
 // Session sync
 function useSessions(api: ApiClient): {
-  sessions: StoredSession[]; save(session: Session): Promise<void>; error?: string; loading: boolean;
+  sessions: StoredSession[]; save(session: Session): Promise<201 | 200>; error?: string; loading: boolean;
 };
 
 // UI
-FilePicker     { onLoad(fixture: Fixture): void; onError(message: string): void }
-AnalysisView   { angles: number[]; reps: number; repEndFrames: number[]; expectedReps?: number }
-SessionsList   { sessions: StoredSession[] }
+FilePicker     { onLoad(name: string, fixture: Fixture): void; onError(message: string): void }
+AnalysisView   { angles: (number | null)[]; reps: number; repEndFrames: number[]; expectedReps?: number }
+SessionsList   { sessions: StoredSession[]; loading: boolean; error?: string }
 UserSwitcher   { user: 'alice' | 'bob'; onChange(user: 'alice' | 'bob'): void }
 ```
 

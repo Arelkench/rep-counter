@@ -45,9 +45,15 @@ What would I do beyond the AI-selected "What's next" points?
 
 UI redesign. It's ugly. With extra time spent, it can be a piece of candy.
 
+## System design
+
+![System design](docs/images/system-design.webp)
+
+Editable source: [`docs/design.excalidraw`](docs/design.excalidraw).
+
 ## How it works
 
-[`docs/design.excalidraw`](docs/design.excalidraw) shows every part. In short:
+In short:
 
 - **Browser** reads the fixture, counts reps (`packages/core`), builds `{ sessionId, reps, durationSec, performedAt }` and sends only that. The API client re-parses with a strict schema, so angles can't be sent even by mistake.
 - **Server**: token guard (401) → strict validator (400, rejects `angles`) → controller → service → store. The `sessionId` primary key decides first save (201) vs repeat (200); same id with other data or another user is 409.

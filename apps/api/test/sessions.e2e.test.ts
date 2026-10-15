@@ -19,6 +19,27 @@ const newSession = (patch: Record<string, unknown> = {}) => ({
   ...patch,
 });
 
+describe('/sessions when the database fails', () => {
+  it('answers 500 { error, message } without leaking the cause', async () => {
+    const broken = {
+      insertIfNew: () => Promise.reject(new Error('SQLITE_IOERR: disk I/O error at /secret/path')),
+      findById: () => Promise.reject(new Error('boom')),
+      listByUser: () => Promise.reject(new Error('SQLITE_IOERR: disk I/O error at /secret/path')),
+    };
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(SESSION_STORE)
+      .useValue(broken)
+      .compile();
+    const app = moduleRef.createNestApplication({ logger: false });
+    await app.init();
+
+    const res = await request(app.getHttpServer()).get('/sessions').set('Authorization', ALICE).expect(500);
+    expect(res.body).toEqual({ error: 'internal', message: 'Something went wrong' });
+    expect(JSON.stringify(res.body)).not.toContain('SQLITE');
+    await app.close();
+  });
+});
+
 describe('/sessions', () => {
   let app: INestApplication;
   const http = () => request(app.getHttpServer());
@@ -96,6 +117,50 @@ describe('/sessions', () => {
       ['a date without timezone', { performedAt: '2026-10-15T10:00:00' }],
     ])('400 for %s', async (_, patch) => {
       await post(ALICE, newSession(patch)).expect(400);
+    });
+  });
+
+  describe('errors always have the shape { error, message }', () => {
+    const expectShape = (body: unknown, error: string) =>
+      expect(body).toEqual({ error, message: expect.any(String) });
+
+    it('401', async () => {
+      expectShape((await list('Bearer nope').expect(401)).body, 'unauthorized');
+    });
+
+    it('400 for invalid fields', async () => {
+      expectShape((await post(ALICE, newSession({ reps: -1 })).expect(400)).body, 'invalid_session');
+    });
+
+    it('400 for malformed JSON', async () => {
+      const res = await http()
+        .post('/sessions')
+        .set('Authorization', ALICE)
+        .set('Content-Type', 'application/json')
+        .send('{"sessionId": ')
+        .expect(400);
+      expectShape(res.body, 'bad_request');
+    });
+
+    it('409', async () => {
+      const s = newSession();
+      await post(ALICE, s).expect(201);
+      expectShape((await post(ALICE, { ...s, reps: 1 }).expect(409)).body, 'conflict');
+    });
+
+    it('404 for an unknown route', async () => {
+      expectShape((await http().get('/nope').set('Authorization', ALICE).expect(404)).body, 'not_found');
+    });
+  });
+
+  describe('concurrency', () => {
+    it('saves once when the same session arrives many times at once', async () => {
+      const s = newSession();
+      const results = await Promise.all(Array.from({ length: 20 }, () => post(ALICE, s)));
+      const statuses = results.map((r) => r.status).sort();
+      expect(statuses.filter((code) => code === 201)).toHaveLength(1);
+      expect(statuses.filter((code) => code === 200)).toHaveLength(19);
+      expect((await list(ALICE)).body.items).toHaveLength(1);
     });
   });
 

@@ -22,6 +22,7 @@ Diagram: [design.excalidraw](design.excalidraw). Angles never leave the browser;
 | HTTP | Auth guard | token → userId, else **401** |
 | HTTP | Validator | body is exactly `sessionId`, `reps`, `durationSec`, `performedAt`, else **400** |
 | HTTP | Controller | new → **201**, same again → **200**, same id + other data → **409**, GET → my list |
+| HTTP | Error filter | every error leaves as `{ error, message }`; 500s are logged, details hidden |
 | Logic | Session service | saves each session once, lists only the user's own |
 | Data | Database access | adds a row only if `sessionId` is new, reads rows by `userId` |
 

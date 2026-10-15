@@ -51,7 +51,17 @@ All requests: `Authorization: Bearer <token>`. Tokens: `alice-token`, `bob-token
 | ok | 200 | `{ "items": StoredSession[] }`, newest `performedAt` first |
 | missing / unknown token | 401 | error |
 
-`StoredSession` = Session + `createdAt`. Error = `{ "error": "conflict", "message": "…" }`.
+`StoredSession` = Session + `createdAt`.
+
+**Errors** — every error, ours or the framework's, is `{ "error": "<code>", "message": "…" }`:
+
+| Status | `error` |
+|---|---|
+| 400 | `invalid_session` (bad fields), `bad_request` (malformed JSON) |
+| 401 | `unauthorized` |
+| 404 | `not_found` |
+| 409 | `conflict` |
+| 500 | `internal` — the cause is logged, never returned |
 
 ## Table
 

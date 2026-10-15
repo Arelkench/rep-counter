@@ -1,0 +1,20 @@
+services:
+  api:
+    build: { context: ., target: api }
+    environment:
+      # AUTH_TOKENS: "alice-token:alice,bob-token:bob"
+      DB_PATH: /data/rep-counter.sqlite
+    volumes:
+      - data:/data
+    restart: unless-stopped
+
+  web:
+    build: { context: ., target: web }
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  data:

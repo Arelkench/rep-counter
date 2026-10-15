@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+apps/api/data
+*.sqlite
+.git
+.github
+.idea
+.claude
+docs

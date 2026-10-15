@@ -11,9 +11,9 @@ export const DOWN_DEG = 100, UP_DEG = 160, FRAMES = 3;
 export type Phase = 'UP' | 'DOWN';
 export interface RepState { phase: Phase; streak: number; reps: number }
 
-export function step(state: RepState, angle: number): RepState;      // one frame, pure
-export function countReps(angles: ArrayLike<number>): number;
-export function analyzeReps(angles: ArrayLike<number>): { reps: number; repEndFrames: number[] };
+export function step(state: RepState, angle: number | null): RepState;   // one frame, pure; null = dropped frame
+export function countReps(angles: ArrayLike<number | null>): number;
+export function analyzeReps(angles: ArrayLike<number | null>): { reps: number; repEndFrames: number[] };
 
 // Session schema (shared by web and API)
 export const SessionSchema;                                          // zod, .strict()
@@ -21,7 +21,7 @@ export type Session = { sessionId: string; reps: number; durationSec: number; pe
 export type StoredSession = Session & { createdAt: string };
 
 export const FixtureSchema;                                          // zod
-export type Fixture = { description?: string; expectedReps?: number; sampleRateHz: number; angles: number[] };
+export type Fixture = { description?: string; expectedReps?: number; sampleRateHz: number; angles: (number | null)[] };
 ```
 
 ## Browser (`apps/web`)

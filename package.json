@@ -1,0 +1,20 @@
+{
+  "name": "rep-counter",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:core": "npm run build -w @rep-counter/core",
+    "dev": "npm run build:core && concurrently -n api,web -c blue,green \"npm run dev -w @rep-counter/api\" \"npm run dev -w @rep-counter/web\"",
+    "test": "npm run build:core && npm test --workspaces --if-present",
+    "typecheck": "npm run build:core && npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "concurrently": "^10.0.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}

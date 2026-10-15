@@ -1,45 +1,52 @@
 # 02 — Architecture
 
-## Overview
+Diagram: [design.excalidraw](design.excalidraw). Angles never leave the browser; only a `session` (4 fields) crosses the network.
 
-System design diagram: [design.excalidraw](design.excalidraw) (open in excalidraw.com or the Excalidraw editor extension).
+## Browser (React)
 
-Angles never leave the browser. Only the 4-field result crosses the network.
-
-## Parts
-
-| Part | Does | Doesn't |
+| Layer | Part | Job |
 |---|---|---|
-| `packages/core` | Counts reps; defines the result schema. Pure TypeScript. | Know about React, Nest or HTTP. |
-| `apps/web` | Loads a fixture, runs `core`, sends the result, shows the list. | Send angles. |
-| `apps/api` | Checks the token, validates, saves once, lists the caller's sessions. | Know about angles. |
-| SQLite | Stores sessions. `sessionId` is the primary key. | — |
+| UI | File picker | loads a fixture JSON |
+| UI | Analysis view | chart, counted vs expected |
+| UI | Sessions list | my sessions, newest first |
+| UI | User switcher | alice / bob → token |
+| Logic | Result builder | angles → reps (via Rep counter) + sessionId, durationSec, performedAt |
+| Logic | Session sync | save the session, then reload the list |
+| Core & data | Rep counter | below 100°, then above 160° = 1 rep |
+| Core & data | API client | adds Bearer token; the only part that talks to the server |
 
-## Saving a session
+## Server (NestJS)
 
-1. Guard maps the token to a user, or returns **401**.
-2. Validation accepts exactly the 4 fields, or returns **400** (so `angles` is rejected).
-3. Insert; if the `sessionId` already exists, nothing is inserted.
-4. If it was inserted → **201**. If it existed with the same user and data → **200**. Otherwise → **409**.
+| Layer | Part | Job |
+|---|---|---|
+| HTTP | Auth guard | token → userId, else **401** |
+| HTTP | Validator | body is exactly `sessionId`, `reps`, `durationSec`, `performedAt`, else **400** |
+| HTTP | Controller | new → **201**, same again → **200**, same id + other data → **409**, GET → my list |
+| Logic | Session service | saves each session once, lists only the user's own |
+| Data | Database access | adds a row only if `sessionId` is new, reads rows by `userId` |
 
-The database primary key decides "first or repeat", so two retries arriving at the same time can't both insert.
+## Database (SQLite)
+
+`sessions` table = rows of the **Session** entity:
+`sessionId` (UUID, primary key), `userId`, `reps`, `durationSec`, `performedAt`, `createdAt`.
+Index on `userId + performedAt`.
 
 ## Key decisions
 
 | Decision | Why |
 |---|---|
-| Shared `core` package | The counter runs in the browser and is tested on its own; web and API use one schema. |
-| Primary key on `sessionId` | "Saved once" is guaranteed by the database, not by app code. |
-| Service returns `created / replayed / conflict`, controller maps to 201/200/409 | HTTP stays out of the logic, which keeps it easy to test. |
-| Web calls the API through a proxy at `/api` | Same origin, so no CORS setup. |
-| Repository interface in front of SQLite | Switching to Postgres later touches one class. |
+| Shared `core` package (Rep counter + session schema) | Runs in the browser, tested alone; web and API use one schema. |
+| Primary key on `sessionId` | "Saved once" is guaranteed by the database, so concurrent retries can't both insert. |
+| Service answers new / repeat / clash; Controller maps to 201 / 200 / 409 | HTTP stays out of the logic. |
+| Web calls the API through a proxy at `/api` | Same origin, no CORS. |
+| Database access behind an interface | Postgres later touches one class. |
 
 ## Layout
 
 ```
-packages/core   counter + schema
-apps/api        NestJS
+packages/core   Rep counter + session schema
 apps/web        React + Vite
+apps/api        NestJS
 fixtures/       test data
 docs/           these docs
 ```

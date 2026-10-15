@@ -9,7 +9,12 @@ interface Props {
 const when = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 export function SessionsList({ sessions, loading, error }: Props) {
-  if (error) return <p className="error">Could not load sessions: {error}</p>;
+  if (error)
+    return (
+      <p className="error" role="alert">
+        Could not load sessions: {error}
+      </p>
+    );
   if (!sessions.length) return <p className="muted">{loading ? 'Loading…' : 'No sessions yet.'}</p>;
 
   return (

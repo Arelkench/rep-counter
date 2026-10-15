@@ -39,10 +39,15 @@ button:disabled { opacity: 0.6; cursor: default; }
 .count { margin: 0 0 8px; }
 .signal { fill: none; stroke: var(--accent); stroke-width: 1.5; }
 .threshold { stroke-width: 1.2; stroke-dasharray: 6 5; }
-.threshold.up, .label.up { stroke: var(--up); fill: var(--up); }
-.threshold.down, .label.down { stroke: var(--down); fill: var(--down); }
-.label { font-size: 12px; stroke: none !important; }
+.threshold.up { stroke: var(--up); }
+.threshold.down { stroke: var(--down); }
 .rep { fill: var(--fg); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.key::before { content: ''; display: inline-block; vertical-align: middle; margin-right: 6px; }
+.key.up::before, .key.down::before { width: 18px; border-top: 2px dashed; }
+.key.up::before { border-color: var(--up); }
+.key.down::before { border-color: var(--down); }
+.key.rep::before { width: 8px; height: 8px; border-radius: 50%; background: var(--fg); }
 .ok { color: var(--up); }
 .bad { color: var(--down); }
 

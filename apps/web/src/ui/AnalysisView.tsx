@@ -43,12 +43,6 @@ export function AnalysisView({ angles, reps, repEndFrames, expectedReps }: Props
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Knee angle over time, ${reps} reps`}>
         <line className="threshold up" x1={0} x2={W} y1={y(UP_DEG)} y2={y(UP_DEG)} />
         <line className="threshold down" x1={0} x2={W} y1={y(DOWN_DEG)} y2={y(DOWN_DEG)} />
-        <text className="label up" x={4} y={y(UP_DEG) - 4}>
-          {UP_DEG}° back up
-        </text>
-        <text className="label down" x={4} y={y(DOWN_DEG) + 14}>
-          {DOWN_DEG}° deep enough
-        </text>
         {segments.map((points, i) => (
           <polyline key={i} className="signal" points={points} />
         ))}
@@ -56,6 +50,12 @@ export function AnalysisView({ angles, reps, repEndFrames, expectedReps }: Props
           <circle key={frame} className="rep" cx={x(frame)} cy={y(angles[frame] ?? UP_DEG)} r={5} />
         ))}
       </svg>
+      {/* Legend in HTML, not inside the SVG, so it stays readable when the chart shrinks on a phone. */}
+      <p className="legend">
+        <span className="key up">{UP_DEG}° back up</span>
+        <span className="key down">{DOWN_DEG}° deep enough</span>
+        <span className="key rep">rep counted</span>
+      </p>
     </section>
   );
 }

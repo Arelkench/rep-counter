@@ -43,6 +43,7 @@ function useSessions(api: ApiClient): {
 };
 
 // UI
+App            { createApi?: (token: string) => ApiClient }   // swap in a fake server for tests
 FilePicker     { onLoad(name: string, fixture: Fixture): void; onError(message: string): void }
 AnalysisView   { angles: (number | null)[]; reps: number; repEndFrames: number[]; expectedReps?: number }
 SessionsList   { sessions: StoredSession[]; loading: boolean; error?: string }

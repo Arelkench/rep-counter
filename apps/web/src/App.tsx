@@ -1,6 +1,6 @@
 import type { Fixture } from '@rep-counter/core';
 import { useMemo, useState } from 'react';
-import { ApiError, createApiClient } from './data/apiClient';
+import { ApiError, createApiClient, type ApiClient } from './data/apiClient';
 import { buildSession, type BuiltSession } from './logic/buildSession';
 import { useSessions } from './logic/useSessions';
 import { AnalysisView } from './ui/AnalysisView';
@@ -15,9 +15,14 @@ interface Loaded {
   built: BuiltSession;
 }
 
-export function App() {
+interface Props {
+  /** Swappable for tests; the real one talks to /api. */
+  createApi?: (token: string) => ApiClient;
+}
+
+export function App({ createApi = createApiClient }: Props) {
   const [user, setUser] = useState<User>('alice');
-  const api = useMemo(() => createApiClient(USERS[user]), [user]);
+  const api = useMemo(() => createApi(USERS[user]), [createApi, user]);
   const { sessions, loading, error, save } = useSessions(api);
 
   const [loaded, setLoaded] = useState<Loaded>();
@@ -62,7 +67,11 @@ export function App() {
       <section>
         <h2>1. Pick a session file</h2>
         <FilePicker onLoad={onLoad} onError={setFileError} />
-        {fileError && <p className="error">{fileError}</p>}
+        {fileError && (
+          <p className="error" role="alert">
+            {fileError}
+          </p>
+        )}
       </section>
 
       {loaded && (
@@ -82,7 +91,7 @@ export function App() {
               Sends only {loaded.built.session.reps} reps, {loaded.built.session.durationSec} s, the time and an id.
             </span>
           </div>
-          {saveMessage && <p>{saveMessage}</p>}
+          <p role="status">{saveMessage}</p>
         </section>
       )}
 

@@ -2,25 +2,7 @@
 
 ## Overview
 
-```mermaid
-flowchart LR
-  subgraph Browser["Browser · React"]
-    F[Fixture file] --> C["core: countReps"]
-    C --> R["Result<br/>sessionId, reps, durationSec, performedAt"]
-    C --> Ch[Chart]
-    L[Sessions list]
-  end
-
-  subgraph API["Server · NestJS"]
-    G[Token guard] --> V[Strict validation] --> S[Sessions service]
-  end
-
-  DB[(SQLite)]
-
-  R -- "POST /sessions" --> G
-  L -- "GET /sessions" --> G
-  S --> DB
-```
+System design diagram: [design.excalidraw](design.excalidraw) (open in excalidraw.com or the Excalidraw editor extension).
 
 Angles never leave the browser. Only the 4-field result crosses the network.
 

@@ -13,6 +13,7 @@ Two states, one pass over the angles.
 - A frame that isn't a number resets the streak.
 - Output: `reps`, plus the frame where each rep finished (for the chart).
 - Must give: clean = 10, noisy = 8, shallow = 7.
+- Cost: one pass, constant memory. 1M frames ≈ 1 ms (`npm run bench -w @rep-counter/core`).
 
 ## Session
 

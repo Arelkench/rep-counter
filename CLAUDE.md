@@ -18,6 +18,7 @@ fixtures/       session-clean / noisy / shallow (10 / 8 / 7 reps)
 ```
 npm run dev        # web + api
 npm test           # all tests
+npm run bench -w @rep-counter/core   # rep counter on 1M frames
 docker compose up  # everything, no Node needed
 ```
 

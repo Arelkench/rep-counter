@@ -26,6 +26,25 @@ Pick **alice** or **bob** in the top right, pick a fixture, press **Save session
 | `DB_PATH` | `apps/api/data/rep-counter.sqlite` (Docker: volume `/data`) |
 | `AUTH_TOKENS` | `alice-token:alice,bob-token:bob` |
 
+## Personal feedback
+
+I started the implementation by following the simple plan I saw from ThePrimeagen in one of his recent videos. Here's the link with the exact timecode: https://youtu.be/FlWII9xFabo?si=lMTWN4GD2aPXXSr_&t=632
+
+So with that idea in mind, I actually put 80% of the effort into imagining and planning the system first. I probably did around 15+ cycles of refining the system design before pushing into the actual materialization of the idea.
+
+I also picked technologies and tools that are new to me and that I never really used, like Drizzle and the SQLite database. But I decided to use at least one I love right now, which is Nest.
+(Shout-out to Kamil Myśliwiec for bringing my current favorite framework to life.)
+
+And about the thing AI got wrong: for me, it was the system design. The initial version was a nightmare; I've attached it below.
+
+![Initial system design](docs/images/initial-design.png)
+
+I also decided to raw-dog it in terms of CLAUDE.md instructions. Plan mode with a list of directions like plan → architecture design → interface design → initial version → refining each part of the system was enough for this.
+
+What would I do beyond the AI-selected "What's next" points?
+
+UI redesign. It's ugly. With extra time spent, it can be a piece of candy.
+
 ## How it works
 
 [`docs/design.excalidraw`](docs/design.excalidraw) shows every part. In short:
@@ -47,7 +66,7 @@ Docs, short: [requirements](docs/01-requirements.md) · [architecture](docs/02-a
 - **"Same data"** compares `performedAt` as an instant: `12:00+02:00` equals `10:00Z`.
 - **409 for another user's id** reveals that the id exists. Accepted: ids are random UUIDs and the brief asks for 409.
 
-## One thing the AI got wrong
+## Another thing the AI got wrong (agent's note)
 
 The agent wrote `data/` in `.gitignore` to keep the SQLite file out of git. That rule also matched `apps/web/src/data/`, the folder holding the API client. The commit went in without it, so the app could not build from a clean checkout.
 

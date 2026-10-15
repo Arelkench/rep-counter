@@ -19,7 +19,7 @@ fixtures/       session-clean / noisy / shallow (10 / 8 / 7 reps)
 npm run dev        # web + api
 npm test           # all tests
 npm run bench -w @rep-counter/core   # rep counter on 1M frames
-docker compose up  # everything, no Node needed
+docker compose up --build  # everything on :8080, no Node needed
 ```
 
 ## Rules
@@ -33,3 +33,5 @@ docker compose up  # everything, no Node needed
 - Keep docs short: requirements, decisions, interfaces. No essays.
 - Commit messages: plain, no AI co-author lines.
 - When the design changes, update `docs/` and the diagram in the same commit.
+- Ignore rules (`.gitignore`, `.dockerignore`) use full paths, never bare folder names: `data/` once hid `apps/web/src/data/`.
+- Before calling work done: fresh clone, `npm ci && npm test`.
